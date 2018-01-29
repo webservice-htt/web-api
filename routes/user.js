@@ -4,6 +4,10 @@ var router = express.Router();
 var mongoose = require('mongoose');
 var UserSchema = require('../models/user');
 var User = mongoose.model('User', UserSchema);
+
+var CourseSchema = require('../models/course');
+var Course = mongoose.model('Course', CourseSchema);
+
 var regexmail = /^[A-z0-9_\.]{4,31}@[a-z0-9]{2,}(\.[a-z0-9]{2,4}){1,2}$/;
 
 /* GET users listing. */
@@ -37,7 +41,7 @@ router.post('/login', function (req, res, next) {
 			} else {
 				if (user.authenticate(password.toString())) {
 					// return res.json({statuscode : 200,results:user});
-					return res.json({statuscode : 200,results:"true"});
+					return res.json({statuscode : 200,results:user});
 				} else {
 					return res.json({statuscode : 404,results:'wrong password'});
 				}
@@ -48,22 +52,24 @@ router.post('/login', function (req, res, next) {
 
 router.post('/:userId/course', function (req, res, next) {
 	var user = req.user;
-	var avatar = req.body.avatar ? req.body.avatar : '';
-	// if (!avatar) {
-	// 		res.json({statuscode : 404,results:'avatar is require'});
-	// } else {
-	// 	user.avatar = avatar;
-	// 	user.save(function(err) {
-	// 		if (err) {
-	// 			res.json({statuscode : 404,results:'avatar is require'});
-	// 		} else {
-	// 			res.json({statuscode : 200,results:user});
-	// 		}
-	// 	})
-	// }
+	var course = req.body.course
+	if (course && course.length > 0) {
+		user.course = course
+		user.save((err) => {
+			if (err) {
+				res.json({statuscode : 404,results:'course is require'});
+			} else {
+				Course.populate(user, {path:"course"}, function(err, u) { 
+					if (err) res.json({statuscode : 404,results:'populate error'});
+					else res.json({statuscode : 200,results:u});
+				});
+				
+			}
+		})
+	}
 });
 
-// createUser()
+createUser()
 
 function createUser() {
 	User.remove({}, function(err) {
@@ -84,6 +90,7 @@ function createUser() {
 			user.email = i + "@ptit.edu.vn"
 			user.birthday = "11/11/1996"
 			user.course = []
+			if (i == "Long") user.role = 1
 			if (i == "Trang") user.gender = true
 
 			user.save((error) => {

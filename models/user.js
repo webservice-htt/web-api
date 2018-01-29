@@ -5,6 +5,10 @@ var crypto = require('crypto'),
 
 var User = new Schema({
 	name : String,
+	role : {
+		type: Number,
+		default: 0
+	},
 	email : {
 		type : String,
 		unique : true
