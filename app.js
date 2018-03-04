@@ -17,7 +17,7 @@ var mongoose = require('mongoose');
 
 // var uri = "mongodb://root:123@cluster0-shard-00-00-ntxsv.mongodb.net:27017,cluster0-shard-00-01-ntxsv.mongodb.net:27017,cluster0-shard-00-02-ntxsv.mongodb.net:27017/qlsv?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin"
 //mlab
-var uri = "mongodb://root:123@ds046867.mlab.com:46867/qlsv"
+var uri = "mongodb://root:123@ds153978.mlab.com:53978/onlinecourse"
 
 mongoose.connect(uri);
 var db = mongoose.connection;

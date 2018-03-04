@@ -3,7 +3,15 @@ var	Schema = mongoose.Schema;
 
 let Course = new Schema({
 	tenKH : String,
-	description : String
+	description : String,
+	image : String,
+	lessons : [{
+		type : Schema.Types.ObjectId,
+		ref : 'Lesson'
+	}],
+	fee : Number,
+	status : Boolean
+
 },{
 	versionKey : false
 });

@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 
 var mongoose = require('mongoose');
+var async = require('async');
 var UserSchema = require('../models/user');
 var User = mongoose.model('User', UserSchema);
 
@@ -48,6 +49,53 @@ router.post('/login', function (req, res, next) {
 			}
 		});
 	}
+});
+
+router.post('/register', function(req, res, next){
+	var email = req.body.email ? req.body.email.trim() : '';
+	var password = req.body.password ? req.body.password.trim() : '';
+	var name = req.body.name ? req.body.name.trim() : '';
+	var user;
+
+	async.series({
+		checkFields : function (callback) {
+			if (!email) {
+				return callback('email is require');
+			} else if (!password) {
+				return callback('password is require');
+			} else {
+				if (!regexmail.test(email)) {
+					return callback('email is invalid');
+				} else {
+					User.findOne({
+						email : email
+					}, function (err, user) {
+						if (user) {
+							return callback('email existed')
+						} else if (err) {
+							return callback(err);
+						} else {
+							callback();
+						}
+					});
+				}
+			}
+		},
+		createUser : function(callback) {
+			user = new User(req.body);
+			user.password = req.body.password;
+			user.save(function(error) {
+				if (error) callback(error);
+				else callback();
+			})
+		}
+	}, function (err, results) {
+		if (err) {
+			res.json({statuscode : 404,results:err});
+		} else {
+			res.json({statuscode : 200,results:user});
+		}	
+	});
 });
 
 router.post('/:userId/course', function (req, res, next) {
