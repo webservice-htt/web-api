@@ -21,7 +21,101 @@ router.get('/', function(req, res, next) {
 			});
 });
 
-createCourse()
+router.get('/:courseId', function(req, res, next) {
+	res.json({statuscode : 200,results:req.course});
+});
+
+
+router.post('/', function(req, res, next) {
+	var user;
+	var image = req.body.image ? req.body.image.trim() : '';
+	var tenKH = req.body.tenKH ? req.body.tenKH.trim() : '';
+	var description = req.body.description ? req.body.description.trim() : '';
+	var lessons = req.body.lessons ? req.body.lessons : [];	
+	
+	var course = new Course(req.body);
+	course.lessons = [];
+    for(let i in lessons) {
+		var lesson = new Lesson(lessons[i])
+		lesson.save((error) => {
+			if (error) {
+				console.log(error, " Loi")
+				return res.json({statuscode : 404,results : 'Error'}); 
+			}
+		})	
+		course.lessons.push(lesson)
+		
+	}
+	course.save(function(error) {
+		if (error) {
+				console.log(error, " Loi")
+				return res.json({statuscode : 404,results : 'Error'}); 
+			}
+		else return res.json({statuscode : 200,results : course});
+	});
+});
+
+router.put('/:courseId', function(req, res, next) {
+	var user;
+	var image = req.body.image ? req.body.image.trim() : '';
+	var tenKH = req.body.tenKH ? req.body.tenKH.trim() : '';
+	var description = req.body.description ? req.body.description.trim() : '';
+	var lessons = req.body.lessons ? req.body.lessons : [];	
+	
+	var course = req.course
+
+	if (image != '') course.image = image 
+	if (tenKH != '') course.tenKH = tenKH 
+	if (description != '') course.description = description 
+	if (lessons.count > 0) {
+	    for(let i in lessons) {
+			var lesson = new Lesson(lessons[i])
+			lesson.save((error) => {
+				if (error) {
+					console.log(error, " Loi")
+					return res.json({statuscode : 404,results : 'Error'}); 
+				}
+			})	
+			course.lessons.push(lesson)
+			
+		}
+	}
+	course.save(function(error) {
+		if (error) {
+			console.log(error, " Loi")
+			return res.json({statuscode : 404,results : 'Error'}); 
+		}
+		else return res.json({statuscode : 200,results : course});
+	});
+});
+
+router.delete('/:courseId', function(req, res, next) {
+	var course = req.course
+	course.remove(err => {
+		if (!err) {
+			return res.json({statuscode : 200,results : 'Success'});
+		} else {
+			console.log(err);
+			return res.json({statuscode : 404,results : 'Courses not found'});
+		}
+	})
+});
+
+/* GET users listing. */
+router.get('/', function(req, res, next) {
+  	Course.find({})
+  		  .populate('lessons')
+  		  .exec(function (err, courses) {
+  		  	console.log(err, courses)
+			if (err || !courses){
+					return res.json({statuscode : 404,results : 'Courses not found'});
+				} else {
+					return res.json({statuscode : 200,results : courses});
+				}
+			});
+});
+
+// createCourse()
 
 function createCourse() {
 	Course.remove({}, function(err) {
@@ -99,5 +193,23 @@ function createCourse() {
 		}
 	}
 }
+
+router.param('courseId', function (req, res, next) {
+	var id = req.params.courseId;
+	console.log(mongoose.Types.ObjectId(id))
+	Course.findOne({
+			_id : mongoose.Types.ObjectId(id)
+		}) 
+		.populate('lessons')
+		.exec(function (err, course) {
+			console.log(err, course)
+			if (err || !course){
+				return res.json({statuscode : 404,results : 'Course was not found'});
+			} else {
+				req.course = course;
+				next();
+			}
+		});
+});
 
 module.exports = router;
