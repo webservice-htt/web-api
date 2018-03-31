@@ -113,6 +113,8 @@ router.put('/:courseId', function(req, res, next) {
 	var user;
 	var image = req.body.image ? req.body.image.trim() : '';
 	var tenKH = req.body.tenKH ? req.body.tenKH.trim() : '';
+	var fee = req.body.fee ? req.body.fee.trim() : '';
+	var link = req.body.link ? req.body.link.trim() : '';
 	var description = req.body.description ? req.body.description.trim() : '';
 	var lessons = req.body.lessons ? req.body.lessons : [];	
 	
@@ -121,6 +123,8 @@ router.put('/:courseId', function(req, res, next) {
 	if (image != '') course.image = image 
 	if (tenKH != '') course.tenKH = tenKH 
 	if (description != '') course.description = description 
+	if (fee != '') course.fee = fee 
+	if (link != '') course.link = link 
 	if (lessons.length > 0) {
 	    for(let i in lessons) {
 			var lesson = new Lesson(lessons[i])
