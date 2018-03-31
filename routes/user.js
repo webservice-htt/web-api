@@ -169,14 +169,14 @@ router.param('userId', function (req, res, next) {
 	User.findOne({
 		_id : id
 	})
-	.populate('course')
-  	.populate({ 
-  		path:  'course',
-	    populate: {
-	    	path:  'courseId',
-		    model: 'Course'
-	    }
-	})
+	// .populate('course')
+ //  	.populate({ 
+ //  		path:  'course',
+	//     populate: {
+	//     	path:  'courseId',
+	// 	    model: 'Course'
+	//     }
+	// })
 	.exec(function (err, user) {
 		if (err || !user) {
 			return res.json({statuscode : 404,results : {}});  
