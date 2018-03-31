@@ -29,18 +29,7 @@ router.get('/', function(req, res, next) {
 		if (err || !users){
 			return res.json({statuscode : 404,results : {}});
 		} else {
-			// console.log(users[0])
-			// Course.populate(users[0], {})
-			// .populate({ path:  'course.$courseId',
-			// 		    model: 'Course'
-			// })
-			// .exec(function (err, users2) {
-			// 	if (err || !users2){
-			// 		return res.json({statuscode : 404,results : {}});
-			// 	} else {
-					return res.json({statuscode : 200,results : users});
-				// }
-			// });
+			return res.json({statuscode : 200,results : users});
 		}
 	});
 });
@@ -176,28 +165,24 @@ function createUser() {
 
 router.param('userId', function (req, res, next) {
 	var id = req.params.userId;
+	console.log(id)
 	User.findOne({
 		_id : id
 	})
-	// .populate('course')
-	// .populate({
-	// 	path:     'course',			
-	// 	populate: { path:  'courseId',
-	// 		    model: 'Course' }
-	// })
+	.populate('course')
+  	.populate({ 
+  		path:  'course',
+	    populate: {
+	    	path:  'courseId',
+		    model: 'Course'
+	    }
+	})
 	.exec(function (err, user) {
 		if (err || !user) {
 			return res.json({statuscode : 404,results : {}});  
 		} else {
-			// Course
-			//   .populate(user,  { path : 'course.courseId',
-   //                    model: 'Course'})
-			//   .exec(function(err, user2) {
-			//   	console.log(err, user2)
-			//     if (err) return res.json({statuscode : 404,results : {}});
-			    req.user = user;
-			// 	next();
-			// });
+		    req.user = user;
+		    next();
 		}
 	});
 });

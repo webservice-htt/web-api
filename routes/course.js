@@ -121,7 +121,7 @@ router.put('/:courseId', function(req, res, next) {
 	if (image != '') course.image = image 
 	if (tenKH != '') course.tenKH = tenKH 
 	if (description != '') course.description = description 
-	if (lessons.count > 0) {
+	if (lessons.length > 0) {
 	    for(let i in lessons) {
 			var lesson = new Lesson(lessons[i])
 			lesson.save((error) => {

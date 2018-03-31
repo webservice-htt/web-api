@@ -29,9 +29,21 @@ router.get('/:categoryId', function(req, res, next) {
 
 router.post('/', function(req, res, next) {
 	var name = req.body.name ? req.body.name.trim() : '';
-	
+	var course = req.body.course ? req.body.course : [];
+	var category = req.category
+
+	if (name != '') course.name = name 
+	else res.json({statuscode : 404,results : {}});
+
 	var category = new Category(req.body);
 	category.course = [];
+
+	if (course.length > 0) {
+	    for(let i in course) {
+			category.course.push(course[i])
+		}
+	}
+
 	category.save(function(error) {
 		if (error) {
 			return res.json({statuscode : 404,results : {}}); 
@@ -39,37 +51,30 @@ router.post('/', function(req, res, next) {
 	});
 });
 
-router.put('/:courseId', function(req, res, next) {
-	var user;
-	var image = req.body.image ? req.body.image.trim() : '';
-	var tenKH = req.body.tenKH ? req.body.tenKH.trim() : '';
-	var description = req.body.description ? req.body.description.trim() : '';
-	var lessons = req.body.lessons ? req.body.lessons : [];	
-	
-	var course = req.course
+router.put('/:categoryId', function(req, res, next) {
+	var name = req.body.name ? req.body.name.trim() : '';
+	var course = req.body.course ? req.body.course : [];
+	var category = req.category
 
-	if (image != '') course.image = image 
-	if (tenKH != '') course.tenKH = tenKH 
-	if (description != '') course.description = description 
-	if (lessons.count > 0) {
-	    for(let i in lessons) {
-			var lesson = new Lesson(lessons[i])
-			lesson.save((error) => {
-				if (error) {
-					console.log(error, " Loi")
-					return res.json({statuscode : 404,results : {}}); 
-				}
-			})	
-			course.lessons.push(lesson)
-			
+	if (name != '') course.name = name 
+	if (course.length > 0) {
+	    for(let i in course) {
+			category.course.push(course[i])
 		}
 	}
-	course.save(function(error) {
+	category.save(function(error) {
 		if (error) {
-			console.log(error, " Loi")
 			return res.json({statuscode : 404,results : {}}); 
 		}
-		else return res.json({statuscode : 200,results : course});
+		else {
+			category.populate({ path : "course", model : "Course"}, (err, categoryPopulated) => {
+				if (err) {
+					return res.json({statuscode : 404,results : {}}); 
+				} else {
+					return res.json({statuscode : 200,results : categoryPopulated});
+				}
+			});
+		}
 	});
 });
 
