@@ -9,8 +9,8 @@ let Course = new Schema({
 		type : Schema.Types.ObjectId,
 		ref : 'Lesson'
 	}],
-	fee : Number,
-	status : Boolean
+	link : String,
+	fee : Number
 
 },{
 	versionKey : false

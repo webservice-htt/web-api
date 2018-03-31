@@ -4,8 +4,13 @@ var router = express.Router();
 var mongoose = require('mongoose');
 var CourseSchema = require('../models/course');
 var LessonSchema = require('../models/lesson');
+var UserSchema = require('../models/user');
+var CourseStatusSchema = require('../models/course_status');
+
 var Course = mongoose.model('Course', CourseSchema);
 var Lesson = mongoose.model('Lesson', LessonSchema);
+var User = mongoose.model('User', UserSchema);
+var CourseStatus = mongoose.model('CourseStatus', CourseStatusSchema);
 
 /* GET users listing. */
 router.get('/', function(req, res, next) {
@@ -53,6 +58,54 @@ router.post('/', function(req, res, next) {
 			}
 		else return res.json({statuscode : 200,results : course});
 	});
+});
+
+
+router.post('/:courseId', function(req, res, next) {
+	var userEmail = req.body.userEmail ? req.body.userEmail.trim() : '';
+	var course = req.course
+	User.findOne({ email : userEmail })
+  		  .exec(function (err, user) {
+			if (err || !user){
+					return res.json({statuscode : 404,results : 'User not found'});
+				} else {
+					var cs = new CourseStatus()
+					cs.courseId = course._id
+					cs.save();
+					var courses = user.course
+					courses.push(cs)
+					user.course = courses
+					user.save(err => {
+						console.log(err)
+						if (!err) {
+							res.json({statuscode : 200,results : user});
+						} else {
+							res.json({statuscode : 404,results : 'Error when save User'});
+						}
+					})
+				}
+			});
+});
+
+
+router.get('/active/:courseStatusId', function(req, res, next) {
+
+	CourseStatus.findOne({ _id : req.params.courseStatusId })
+  		  .exec(function (err, cs) {
+			if (err || !cs){
+					return res.json({statuscode : 404,results : 'Course Status not found'});
+				} else {
+					cs.status = 1
+					cs.save(err => {
+						console.log(err)
+						if (!err) {
+							res.json({statuscode : 200,results : cs});
+						} else {
+							res.json({statuscode : 404,results : 'Error when save Course Status'});
+						}
+					})
+				}
+			});
 });
 
 router.put('/:courseId', function(req, res, next) {
@@ -106,7 +159,6 @@ router.get('/', function(req, res, next) {
   	Course.find({})
   		  .populate('lessons')
   		  .exec(function (err, courses) {
-  		  	console.log(err, courses)
 			if (err || !courses){
 					return res.json({statuscode : 404,results : 'Courses not found'});
 				} else {
@@ -118,6 +170,7 @@ router.get('/', function(req, res, next) {
 // createCourse()
 
 function createCourse() {
+	console.log("createCourse")
 	Course.remove({}, function(err) {
             if (err) {
                 console.log(err)
@@ -196,13 +249,11 @@ function createCourse() {
 
 router.param('courseId', function (req, res, next) {
 	var id = req.params.courseId;
-	console.log(mongoose.Types.ObjectId(id))
 	Course.findOne({
 			_id : mongoose.Types.ObjectId(id)
 		}) 
 		.populate('lessons')
 		.exec(function (err, course) {
-			console.log(err, course)
 			if (err || !course){
 				return res.json({statuscode : 404,results : 'Course was not found'});
 			} else {

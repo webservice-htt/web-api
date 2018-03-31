@@ -21,7 +21,7 @@ var User = new Schema({
 	},
 	course : [{
 		type : Schema.Types.ObjectId,
-		ref : 'Course'
+		ref : 'CourseStatus'
 	}],
 	hashed_password : String,
 	salt : String

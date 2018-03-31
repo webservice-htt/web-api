@@ -13,7 +13,8 @@ var regexmail = /^[A-z0-9_\.]{4,31}@[a-z0-9]{2,}(\.[a-z0-9]{2,4}){1,2}$/;
 
 /* GET users listing. */
 router.get('/', function(req, res, next) {
-  	User.find({}, function (err, users) {
+  	User.find({}).populate('course')
+  	.exec(function (err, users) {
 		if (err || !users){
 			return res.json({statuscode : 404,results : 'Users not found'});
 		} else {
@@ -117,9 +118,10 @@ router.post('/:userId/course', function (req, res, next) {
 	}
 });
 
-createUser()
+// createUser()
 
 function createUser() {
+	console.log("create User")
 	User.remove({}, function(err) {
             if (err) {
                 console.log(err)
@@ -129,6 +131,7 @@ function createUser() {
         }
     );
 	function create() {
+		console.log("Create")
 		var names = ["Duc", "Hung", "Tuan", "Long", "Trang"]
 		let user
 		for (let i of names) {
@@ -137,7 +140,7 @@ function createUser() {
 			user.password = "123";
 			user.email = i + "@ptit.edu.vn"
 			user.birthday = "11/11/1996"
-			user.course = []
+			// user.course = []
 			if (i == "Long") user.role = 1
 			if (i == "Trang") user.gender = true
 
@@ -152,13 +155,15 @@ router.param('userId', function (req, res, next) {
 	var id = req.params.userId;
 	User.findOne({
 		_id : id
-	}, function (err, user) {
-		if (err || !user){
-			return res.json({statuscode : 404,results : 'User was not found'});
-		} else {
-			req.user = user;
-			next();
-		}
+	})
+		.populate('course')
+		.exec(function (err, user) {
+			if (err || !user){
+				return res.json({statuscode : 404,results : 'User was not found'});
+			} else {
+				req.user = user;
+				next();
+			}
 	});
 });
 
