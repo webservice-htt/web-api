@@ -168,7 +168,7 @@ router.get('/', function(req, res, next) {
 			});
 });
 
-createCourse()
+// createCourse()
 
 function createCourse() {
 	console.log("createCourse")
@@ -250,6 +250,7 @@ function createCourse() {
 			}
 			// course.lessons = lessons[i];
 			course.tenKH = "Lap Trinh " + i;
+			course.fee = "800000"
 			// course.description = "Bạn sẽ được trải nghiệm khóa học lập trình " + i + " với đội ngũ giáo viên cực chuyên nghiệp"
 			course.description = "Khoa hoc " + i + " voi doi ngu chuyen nghiep hon bao gio het"
 			course.save((error) => {

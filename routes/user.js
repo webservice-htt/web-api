@@ -16,12 +16,31 @@ var regexmail = /^[A-z0-9_\.]{4,31}@[a-z0-9]{2,}(\.[a-z0-9]{2,4}){1,2}$/;
 
 /* GET users listing. */
 router.get('/', function(req, res, next) {
-  	User.find({}).populate('course')
+  	User.find({})
+  	.populate('course')
+  	.populate({ 
+  		path:  'course',
+	    populate: {
+	    	path:  'courseId',
+		    model: 'Course'
+	    }
+	})
   	.exec(function (err, users) {
 		if (err || !users){
 			return res.json({statuscode : 404,results : {}});
 		} else {
-			return res.json({statuscode : 200,results : users});
+			// console.log(users[0])
+			// Course.populate(users[0], {})
+			// .populate({ path:  'course.$courseId',
+			// 		    model: 'Course'
+			// })
+			// .exec(function (err, users2) {
+			// 	if (err || !users2){
+			// 		return res.json({statuscode : 404,results : {}});
+			// 	} else {
+					return res.json({statuscode : 200,results : users});
+				// }
+			// });
 		}
 	});
 });
@@ -160,7 +179,7 @@ router.param('userId', function (req, res, next) {
 	User.findOne({
 		_id : id
 	})
-	.populate('course')
+	// .populate('course')
 	// .populate({
 	// 	path:     'course',			
 	// 	populate: { path:  'courseId',
@@ -171,11 +190,13 @@ router.param('userId', function (req, res, next) {
 			return res.json({statuscode : 404,results : {}});  
 		} else {
 			// Course
-			//   .populate('course.$courseId')
+			//   .populate(user,  { path : 'course.courseId',
+   //                    model: 'Course'})
 			//   .exec(function(err, user2) {
+			//   	console.log(err, user2)
 			//     if (err) return res.json({statuscode : 404,results : {}});
 			    req.user = user;
-				// next();
+			// 	next();
 			// });
 		}
 	});
