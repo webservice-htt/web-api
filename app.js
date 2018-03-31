@@ -8,6 +8,7 @@ var bodyParser = require('body-parser');
 var index = require('./routes/index');
 var user = require('./routes/user');
 var course = require('./routes/course');
+var category = require('./routes/category');
 
 var app = express();
 
@@ -18,6 +19,7 @@ var mongoose = require('mongoose');
 // var uri = "mongodb://root:123@cluster0-shard-00-00-ntxsv.mongodb.net:27017,cluster0-shard-00-01-ntxsv.mongodb.net:27017,cluster0-shard-00-02-ntxsv.mongodb.net:27017/qlsv?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin"
 //mlab
 var uri = "mongodb://root:123@ds153978.mlab.com:53978/onlinecourse"
+// var uri = "mongodb://localhost:27017/onlinecourse"
 
 mongoose.connect(uri);
 var db = mongoose.connection;
@@ -45,6 +47,7 @@ app.use(cookieParser());
 app.use('/', index);
 app.use('/user', user);
 app.use('/course', course);
+app.use('/category', category);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
