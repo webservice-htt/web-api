@@ -9,6 +9,9 @@ var User = mongoose.model('User', UserSchema);
 var CourseSchema = require('../models/course');
 var Course = mongoose.model('Course', CourseSchema);
 
+var CourseStatusSchema = require('../models/course_status');
+var CourseStatus = mongoose.model('CourseStatus', CourseStatusSchema);
+
 var regexmail = /^[A-z0-9_\.]{4,31}@[a-z0-9]{2,}(\.[a-z0-9]{2,4}){1,2}$/;
 
 /* GET users listing. */
@@ -16,7 +19,7 @@ router.get('/', function(req, res, next) {
   	User.find({}).populate('course')
   	.exec(function (err, users) {
 		if (err || !users){
-			return res.json({statuscode : 404,results : 'Users not found'});
+			return res.json({statuscode : 404,results : {}});
 		} else {
 			return res.json({statuscode : 200,results : users});
 		}
@@ -32,20 +35,20 @@ router.post('/login', function (req, res, next) {
 	var email = req.body.email ? req.body.email.trim() : '';
 	var password = req.body.password ? req.body.password.trim() : '';	
 	if (!regexmail.test(email)){
-		return res.json({statuscode : 404,results:'email is invalid'});
+		return res.json({statuscode : 404,results: {}});
 	}
 	else {
 		User.findOne({
 			email : email
 		}, function (err, user) {
 			if (err || !user){
-				return res.json({statuscode : 404,results : 'user was not found'});
+				return res.json({statuscode : 404,results : {}});
 			} else {
 				if (user.authenticate(password.toString())) {
 					// return res.json({statuscode : 200,results:user});
 					return res.json({statuscode : 200,results:user});
 				} else {
-					return res.json({statuscode : 404,results:'wrong password'});
+					return res.json({statuscode : 404,results: {}});
 				}
 			}
 		});
@@ -92,7 +95,7 @@ router.post('/register', function(req, res, next){
 		}
 	}, function (err, results) {
 		if (err) {
-			res.json({statuscode : 404,results:err});
+			res.json({statuscode : 404,results: {}});
 		} else {
 			res.json({statuscode : 200,results:user});
 		}	
@@ -106,10 +109,10 @@ router.post('/:userId/course', function (req, res, next) {
 		user.course = course
 		user.save((err) => {
 			if (err) {
-				res.json({statuscode : 404,results:'course is require'});
+				res.json({statuscode : 404,results: {}});
 			} else {
 				Course.populate(user, {path:"course"}, function(err, u) { 
-					if (err) res.json({statuscode : 404,results:'populate error'});
+					if (err) res.json({statuscode : 404,results: {}});
 					else res.json({statuscode : 200,results:u});
 				});
 				
@@ -151,19 +154,30 @@ function createUser() {
 	}
 }
 
+
 router.param('userId', function (req, res, next) {
 	var id = req.params.userId;
 	User.findOne({
 		_id : id
 	})
-		.populate('course')
-		.exec(function (err, user) {
-			if (err || !user){
-				return res.json({statuscode : 404,results : 'User was not found'});
-			} else {
-				req.user = user;
-				next();
-			}
+	.populate('course')
+	// .populate({
+	// 	path:     'course',			
+	// 	populate: { path:  'courseId',
+	// 		    model: 'Course' }
+	// })
+	.exec(function (err, user) {
+		if (err || !user) {
+			return res.json({statuscode : 404,results : {}});  
+		} else {
+			// Course
+			//   .populate('course.$courseId')
+			//   .exec(function(err, user2) {
+			//     if (err) return res.json({statuscode : 404,results : {}});
+			    req.user = user;
+				// next();
+			// });
+		}
 	});
 });
 

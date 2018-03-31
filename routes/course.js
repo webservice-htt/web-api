@@ -6,11 +6,13 @@ var CourseSchema = require('../models/course');
 var LessonSchema = require('../models/lesson');
 var UserSchema = require('../models/user');
 var CourseStatusSchema = require('../models/course_status');
+var CategorySchema = require('../models/category');
 
 var Course = mongoose.model('Course', CourseSchema);
 var Lesson = mongoose.model('Lesson', LessonSchema);
 var User = mongoose.model('User', UserSchema);
 var CourseStatus = mongoose.model('CourseStatus', CourseStatusSchema);
+var Category = mongoose.model('Category', CategorySchema);
 
 /* GET users listing. */
 router.get('/', function(req, res, next) {
@@ -19,7 +21,7 @@ router.get('/', function(req, res, next) {
   		  .exec(function (err, courses) {
   		  	console.log(err, courses)
 			if (err || !courses){
-					return res.json({statuscode : 404,results : 'Courses not found'});
+					return res.json({statuscode : 404,results : {}});
 				} else {
 					return res.json({statuscode : 200,results : courses});
 				}
@@ -29,7 +31,6 @@ router.get('/', function(req, res, next) {
 router.get('/:courseId', function(req, res, next) {
 	res.json({statuscode : 200,results:req.course});
 });
-
 
 router.post('/', function(req, res, next) {
 	var user;
@@ -45,7 +46,7 @@ router.post('/', function(req, res, next) {
 		lesson.save((error) => {
 			if (error) {
 				console.log(error, " Loi")
-				return res.json({statuscode : 404,results : 'Error'}); 
+				return res.json({statuscode : 404,results : {}}); 
 			}
 		})	
 		course.lessons.push(lesson)
@@ -54,7 +55,7 @@ router.post('/', function(req, res, next) {
 	course.save(function(error) {
 		if (error) {
 				console.log(error, " Loi")
-				return res.json({statuscode : 404,results : 'Error'}); 
+				return res.json({statuscode : 404,results : {}}); 
 			}
 		else return res.json({statuscode : 200,results : course});
 	});
@@ -67,7 +68,7 @@ router.post('/:courseId', function(req, res, next) {
 	User.findOne({ email : userEmail })
   		  .exec(function (err, user) {
 			if (err || !user){
-					return res.json({statuscode : 404,results : 'User not found'});
+					return res.json({statuscode : 404,results : {}});
 				} else {
 					var cs = new CourseStatus()
 					cs.courseId = course._id
@@ -80,7 +81,7 @@ router.post('/:courseId', function(req, res, next) {
 						if (!err) {
 							res.json({statuscode : 200,results : user});
 						} else {
-							res.json({statuscode : 404,results : 'Error when save User'});
+							res.json({statuscode : 404,results : {}});
 						}
 					})
 				}
@@ -93,7 +94,7 @@ router.get('/active/:courseStatusId', function(req, res, next) {
 	CourseStatus.findOne({ _id : req.params.courseStatusId })
   		  .exec(function (err, cs) {
 			if (err || !cs){
-					return res.json({statuscode : 404,results : 'Course Status not found'});
+					return res.json({statuscode : 404,results : {}});
 				} else {
 					cs.status = 1
 					cs.save(err => {
@@ -101,7 +102,7 @@ router.get('/active/:courseStatusId', function(req, res, next) {
 						if (!err) {
 							res.json({statuscode : 200,results : cs});
 						} else {
-							res.json({statuscode : 404,results : 'Error when save Course Status'});
+							res.json({statuscode : 404,results : {}});
 						}
 					})
 				}
@@ -126,7 +127,7 @@ router.put('/:courseId', function(req, res, next) {
 			lesson.save((error) => {
 				if (error) {
 					console.log(error, " Loi")
-					return res.json({statuscode : 404,results : 'Error'}); 
+					return res.json({statuscode : 404,results : {}}); 
 				}
 			})	
 			course.lessons.push(lesson)
@@ -136,7 +137,7 @@ router.put('/:courseId', function(req, res, next) {
 	course.save(function(error) {
 		if (error) {
 			console.log(error, " Loi")
-			return res.json({statuscode : 404,results : 'Error'}); 
+			return res.json({statuscode : 404,results : {}}); 
 		}
 		else return res.json({statuscode : 200,results : course});
 	});
@@ -149,7 +150,7 @@ router.delete('/:courseId', function(req, res, next) {
 			return res.json({statuscode : 200,results : 'Success'});
 		} else {
 			console.log(err);
-			return res.json({statuscode : 404,results : 'Courses not found'});
+			return res.json({statuscode : 404,results : {}});
 		}
 	})
 });
@@ -160,14 +161,14 @@ router.get('/', function(req, res, next) {
   		  .populate('lessons')
   		  .exec(function (err, courses) {
 			if (err || !courses){
-					return res.json({statuscode : 404,results : 'Courses not found'});
+					return res.json({statuscode : 404,results : {}});
 				} else {
 					return res.json({statuscode : 200,results : courses});
 				}
 			});
 });
 
-// createCourse()
+createCourse()
 
 function createCourse() {
 	console.log("createCourse")
@@ -179,16 +180,26 @@ function createCourse() {
 			            if (err2) {
 			                console.log(err2)
 			            } else {
-			                create()
+			                Category.remove({}, err => {
+			                	let categories = ["Tieng Thai", "Office365", "Lap Trinh", "Tieng Anh", "Tieng Nhat", "Tieng Han", "Nau An", "Su dung Photoshop"]
+							    for (var i in categories) {
+							    	create(categories[i])
+							    }
+			                })
 			            }
 			        }
 			    );
             }
         }
     );
-	function create() {
+    
+	function create(categoryName) {
+		var category = new Category()
+		category.name = categoryName
+
 		let courses = ["C++", "C#", "Java", "Web", "Android", "iOS"]
 		let images = {}
+
 		images["C++"] = "https://toidammeit.files.wordpress.com/2016/07/499292_1aeb_2.jpg?w=750";
 		images["C#"] = "https://giabaoit.com/wp-content/uploads/2017/12/c-sharp-680x380.jpg";
 		images["Java"] = "https://giabaoit.com/wp-content/uploads/2018/01/lap-trinh-java-651x380.jpg";
@@ -227,6 +238,7 @@ function createCourse() {
 			// course.tenKH = "Lập trình " + i;
 			course.lessons = []
 			course.image = images[i]
+			category.course.push(course._id)
 			for(let j in lessons[i]) {
 				var lesson = new Lesson(lessons[i][j])
 				lesson.tenBH = i + " : " + lesson.tenBH
@@ -242,8 +254,10 @@ function createCourse() {
 			course.description = "Khoa hoc " + i + " voi doi ngu chuyen nghiep hon bao gio het"
 			course.save((error) => {
 				if (error) console.log(error, " Loi")
+				
 			})
 		}
+		category.save()
 	}
 }
 
@@ -255,7 +269,7 @@ router.param('courseId', function (req, res, next) {
 		.populate('lessons')
 		.exec(function (err, course) {
 			if (err || !course){
-				return res.json({statuscode : 404,results : 'Course was not found'});
+				return res.json({statuscode : 404,results : {}});
 			} else {
 				req.course = course;
 				next();
