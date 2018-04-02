@@ -20,5 +20,4 @@ Category.methods ={
 	}
 }
 
-
 module.exports = Category;

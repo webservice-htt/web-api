@@ -11,9 +11,8 @@ var Category = mongoose.model('Category', CategorySchema);
 /* GET users listing. */
 router.get('/', function(req, res, next) {
   	Category.find({})
-  		  .populate('course')
+  		  // .populate('course')
   		  .exec(function (err, category) {
-  		  	console.log(err, category)
 			if (err || !category){
 					return res.json({statuscode : 404,results : {}});
 				} else {
@@ -104,10 +103,9 @@ router.get('/', function(req, res, next) {
 
 router.param('categoryId', function (req, res, next) {
 	var id = req.params.categoryId;
-	Category.findOne({
-			_id : mongoose.Types.ObjectId(id)
-		}) 
-		.populate('course')
+
+	Category.findOne({ _id : id }) 
+		// .populate('course')
 		.exec(function (err, category) {
 			if (err || !category){
 				return res.json({statuscode : 404,results : {}});

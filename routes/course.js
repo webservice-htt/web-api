@@ -17,7 +17,7 @@ var Category = mongoose.model('Category', CategorySchema);
 /* GET users listing. */
 router.get('/', function(req, res, next) {
   	Course.find({})
-  		  .populate('lessons')
+  		  // .populate('lessons')
   		  .exec(function (err, courses) {
   		  	console.log(err, courses)
 			if (err || !courses){
@@ -158,20 +158,6 @@ router.delete('/:courseId', function(req, res, next) {
 		}
 	})
 });
-
-/* GET users listing. */
-router.get('/', function(req, res, next) {
-  	Course.find({})
-  		  .populate('lessons')
-  		  .exec(function (err, courses) {
-			if (err || !courses){
-					return res.json({statuscode : 404,results : {}});
-				} else {
-					return res.json({statuscode : 200,results : courses});
-				}
-			});
-});
-
 // createCourse()
 
 function createCourse() {
@@ -262,7 +248,9 @@ function createCourse() {
 				
 			})
 		}
-		category.save()
+		category.save((err) => {
+			if (err) console.log(err, " Loi")
+		})
 	}
 }
 
