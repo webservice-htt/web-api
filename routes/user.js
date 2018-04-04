@@ -18,13 +18,13 @@ var regexmail = /^[A-z0-9_\.]{4,31}@[a-z0-9]{2,}(\.[a-z0-9]{2,4}){1,2}$/;
 router.get('/', function(req, res, next) {
   	User.find({})
   	.populate('course')
-  	.populate({ 
-  		path:  'course',
-	    populate: {
-	    	path:  'courseId',
-		    model: 'Course'
-	    }
-	})
+ //  	.populate({ 
+ //  		path:  'course',
+	//     populate: {
+	//     	path:  'courseId',
+	// 	    model: 'Course'
+	//     }
+	// })
   	.exec(function (err, users) {
 		if (err || !users){
 			return res.json({statuscode : 404,results : {}});
@@ -193,7 +193,7 @@ router.param('userId', function (req, res, next) {
 	User.findOne({
 		_id : id
 	})
-	// .populate('course')
+	.populate('course')
  //  	.populate({ 
  //  		path:  'course',
 	//     populate: {
