@@ -48,7 +48,16 @@ router.post('/login', function (req, res, next) {
 	else {
 		User.findOne({
 			email : email
-		}, function (err, user) {
+		})
+		.populate('course')
+	  	.populate({ 
+	  		path:  'course',
+		    populate: {
+		    	path:  'courseId',
+			    model: 'Course'
+		    }
+		})
+		.exec(function (err, user) {
 			if (err || !user){
 				return res.json({statuscode : 404,results : {}});
 			} else {
