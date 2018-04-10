@@ -124,14 +124,12 @@ router.put('/:userId', function(req, res, next) {
 	var user = req.user
 	var name = req.body.name ? req.body.name.trim() : '';
 	var role = req.body.role ? req.body.role.trim() : '';
-	var email = req.body.email ? req.body.email.trim() : '';
 	var phone = req.body.phone ? req.body.phone.trim() : '';
 	var birthday = req.body.birthday ? req.body.birthday.trim() : '';
 	var gender = req.body.gender ? req.body.gender : '';	
 	
 	if (name != '') user.name = name 
 	if (role != '') user.role = role 
-	if (email != '') user.email = email 
 	if (phone != '') user.phone = phone 
 	if (birthday != '') user.birthday = birthday 
 	if (gender != '') user.gender = gender 
