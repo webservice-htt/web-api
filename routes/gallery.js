@@ -39,6 +39,15 @@ router.post('/', function(req, res, next) {
 
 router.put('/:galleryId', function(req, res, next) {
 	var gallery = req.gallery
+	var name = req.body.name ? req.body.name.trim() : '';
+	var url = req.body.url ? req.body.url.trim() : '';
+	var description = req.body.description ? req.body.description.trim() : '';
+
+	if (name != '') req.gallery.name = name;
+	if (url != '') req.gallery.url = url;
+	if (description != '') req.gallery.description = description;
+	
+
 	gallery.save(function(error) {
 		if (error) {
 			return res.json({statuscode : 404,results : {}}); 
