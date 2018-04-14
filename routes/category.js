@@ -55,7 +55,7 @@ router.put('/:categoryId', function(req, res, next) {
 	var course = req.body.course ? req.body.course : [];
 	var category = req.category
 
-	if (name != '') course.name = name 
+	if (name != '') category.name = name 
 	if (course.length > 0) {
 	    for(let i in course) {
 			category.course.push(course[i])
